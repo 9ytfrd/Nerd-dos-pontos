@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nerd dos Pontos</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f4f4f8 url('bg.png') no-repeat center center fixed;
+    background-size: cover;
+  }
+  section { padding: 60px 20px; text-align: center; }
+  .titulo { font-size: 2em; color: #663399; margin-bottom: 20px; }
+  .caixa {
+    background: #ffffffcc;
+    border-radius: 20px;
+    padding: 30px;
+    margin: 20px auto;
+    max-width: 520px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .personagem { width: 100px; margin-bottom: 10px; }
+
+  .minigame-header { font-weight: bold; color: #444; margin-bottom:10px; }
+  .minigame-pergunta { font-size: 1.2em; margin-bottom: 20px; min-height: 48px; display:flex; align-items:center; justify-content:center; text-align:center; padding: 6px; }
+  .minigame-botoes { display:flex; justify-content:center; gap:30px; }
+  .botao-verde, .botao-vermelho {
+    width:60px; height:60px; border-radius:50%; font-size:1.5em; border:none; cursor:pointer; transition:transform .12s;
+  }
+  .botao-verde { background:#4ade80; color:white; } 
+  .botao-vermelho { background:#f87171; color:white; }
+  .botao-verde:hover, .botao-vermelho:hover { transform:scale(1.08); }
+
+  .fade { animation: fadeIn 0.45s ease-in-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+</style>
+</head>
+<body>
+
+<section id="minigame">
+  <div class="minigame-header">Pontos: <span id="pontos">0</span></div>
+  <h2 class="titulo">Nerd dos Pontos</h2>
+  <img alt="Nerd" class="personagem" src="nerd.png"/>
+  <div class="caixa">
+    <div class="minigame-pergunta" id="perguntaMini"></div>
+
+    <div class="minigame-botoes">
+      <button class="botao-verde" onclick="responderMini(true)">○</button>
+      <button class="botao-vermelho" onclick="responderMini(false)">×</button>
+    </div>
+  </div>
+</section>
+
+<script>
+const perguntasMini = [
+  // 30 perguntas originais
+  ["A velocidade da luz no vácuo é ~299.792 km/s.", true],
+  ["A constante de Planck tem ordem de 10⁻³⁴ J·s.", true],
+  ["O número de Avogadro é ~6,022×10²³.", true],
+  ["A teoria da relatividade especial foi proposta por Einstein.", true],
+  ["A Terra tem um ano bissexto a cada 3 anos.", false],
+  ["O átomo é composto por prótons, nêutrons e elétrons.", true],
+  ["O elemento com número atômico 1 é o Hélio.", false],
+  ["A equação E=mc² relaciona energia e massa.", true],
+  ["O pH neutro é igual a 7.", true],
+  ["Buracos negros possuem gravidade extremamente forte.", true],
+  ["A entropia mede a desordem de um sistema.", true],
+  ["O elétron tem carga positiva.", false],
+  ["A camada de ozônio protege contra radiação UV.", true],
+  ["O Big Bang é a principal teoria da origem do universo.", true],
+  ["Um mol contém 6,022×10²³ entidades.", true],
+  ["A distância média da Terra ao Sol é ~150 milhões de km.", true],
+  ["A energia cinética depende da massa e da velocidade ao quadrado.", true],
+  ["O DNA é formado por nucleotídeos.", true],
+  ["A velocidade do som no ar é maior que no aço.", false],
+  ["A lua de Júpiter chamada Europa tem oceanos subterrâneos.", true],
+  ["O núcleo da Terra é sólido no centro.", true],
+  ["A fotossíntese ocorre nas folhas das plantas.", true],
+  ["O Sol é uma estrela do tipo anã amarela.", true],
+  ["A gravidade na Lua é igual à da Terra.", false],
+  ["O núcleo atômico contém prótons e nêutrons.", true],
+  ["A teoria da evolução foi proposta por Darwin.", true],
+  ["O número pi é irracional.", true],
+  ["O campo magnético da Terra muda de direção ao longo do tempo.", true],
+  ["A água se expande ao congelar.", true],
+  ["O oxigênio é essencial para a respiração celular.", true],
+
+  // 50 perguntas novas
+  ["O som se propaga mais rápido na água do que no ar.", true],
+  ["A gravidade da Lua é menor que a da Terra.", true],
+  ["O elétron tem carga negativa.", true],
+  ["O ferro enferruja quando em contato com água e oxigênio.", true],
+  ["A Terra é o único planeta do Sistema Solar com água líquida.", false],
+  ["A camada de ozônio fica na estratosfera.", true],
+  ["O sol é uma estrela de tamanho médio.", true],
+  ["O corpo humano tem quatro pulmões.", false],
+  ["As plantas produzem oxigênio na fotossíntese.", true],
+  ["O mercúrio é líquido à temperatura ambiente.", true],
+  ["A lua não possui atmosfera significativa.", true],
+  ["A água é composta por dois átomos de hidrogênio e um de oxigênio.", true],
+  ["Os dinossauros coexistiram com os humanos.", false],
+  ["A velocidade da luz é maior que a do som.", true],
+  ["A eletricidade é gerada apenas por usinas hidrelétricas.", false],
+  ["O planeta Marte é conhecido como planeta vermelho.", true],
+  ["O planeta Vênus é mais quente que Mercúrio.", true],
+  ["O carbono é essencial para a vida na Terra.", true],
+  ["O sistema circulatório transporta sangue pelo corpo.", true],
+  ["O cérebro humano é dividido em hemisfério esquerdo e direito.", true],
+  ["O álcool é uma fonte de carboidratos.", false],
+  ["O vento é causado pela diferença de pressão atmosférica.", true],
+  ["A Lua gira em torno da Terra.", true],
+  ["A camada de gelo da Antártida é a maior do planeta.", true],
+  ["O ouro é mais pesado que a prata.", true],
+  ["O diamante é feito de carbono.", true],
+  ["O satélite natural da Terra é a Lua.", true],
+  ["A poluição atmosférica afeta a saúde humana.", true],
+  ["As abelhas são responsáveis pela polinização de muitas plantas.", true],
+  ["O pinguim é uma ave que não voa.", true],
+  ["A velocidade da luz no ar é menor que no vácuo.", true],
+  ["O planeta Júpiter é o maior do Sistema Solar.", true],
+  ["A eletricidade estática pode atrair objetos leves.", true],
+  ["As plantas absorvem CO₂ e liberam O₂.", true],
+  ["O núcleo da Terra é composto apenas por ferro.", false],
+  ["O sangue humano contém glóbulos vermelhos e brancos.", true],
+  ["O Sol nasce no leste e se põe no oeste.", true],
+  ["A água salgada é mais densa que a água doce.", true],
+  ["As ondas do mar são causadas principalmente pelo vento.", true],
+  ["O cérebro humano consome mais energia que qualquer outro órgão.", true],
+  ["O álcool etílico é inflamável.", true],
+  ["As vacinas ajudam a prevenir doenças.", true],
+  ["O oxigênio é necessário para a respiração aeróbica.", true],
+  ["A temperatura média da Terra tem aumentado nas últimas décadas.", true],
+  ["O mercúrio é um metal tóxico.", true],
+  ["O ATP é a principal fonte de energia das células.", true],
+  ["A camada terrestre mais externa é a crosta.", true],
+  ["A Lua possui superfície cheia de crateras.", true],
+  ["O fósforo é importante para a formação de ossos e dentes.", true],
+  ["O Sol é a principal fonte de energia do planeta.", true],
+  ["A energia cinética depende da massa e velocidade do corpo.", true],
+  ["O oxigênio representa cerca de 21% da atmosfera terrestre.", true],
+  ["O cloro é usado na água para matar micro-organismos.", true]
+];
+
+let pontos = 0;
+let perguntaAtual = null;
+
+function novaPerguntaMini(){
+  perguntaAtual = perguntasMini[Math.floor(Math.random() * perguntasMini.length)];
+  const perguntaDiv = document.getElementById('perguntaMini');
+  perguntaDiv.classList.remove('fade');
+  void perguntaDiv.offsetWidth;
+  perguntaDiv.textContent = perguntaAtual[0];
+  perguntaDiv.classList.add('fade');
+}
+
+function responderMini(resp){
+  if (!perguntaAtual) return;
+  const ganho = 20;
+
+  if (resp === perguntaAtual[1]) {
+    pontos += ganho;
+    alert("Acertou! Pode pegar seu brinde.");
+  } else {
+    pontos -= ganho;
+    alert("Errou! Mas obrigado por jogar!");
+  }
+
+  document.getElementById('pontos').textContent = pontos;
+
+  novaPerguntaMini();
+}
+
+document.getElementById('pontos').textContent = pontos;
+novaPerguntaMini();
+</script>
+
+</body>
+</html>
